@@ -132,7 +132,7 @@ namespace WpfMouseAbuse
          ti.Restart();
          while (m_lines.TryDequeue(out _line))
             ;
-         last_n = 0;
+         last_n = -9999;
          n_clicks = 0;
       }
 
@@ -141,33 +141,35 @@ namespace WpfMouseAbuse
          Line _line;
          long n = ti.ElapsedMilliseconds;
          if (e.ChangedButton == MouseButton.Right)
+         {
             if (++color_idx > color_max)
                color_idx = 0;
+            return;
+         }
          if (e.ChangedButton == MouseButton.Middle)
             Canvas.Children.Clear();
-         if (e.ChangedButton == MouseButton.Left)
-         {
-            if ((n - last_n) > 600)
-            {
-               ReportResult("Mouse Down");
-               n = 0;
-            }
-            _line = new Line();
-            _line.Stroke = new SolidColorBrush(Colors.White);
-            _line.StrokeThickness = 5;
-            _line.StrokeStartLineCap = PenLineCap.Round;
 
-            _line.StrokeEndLineCap = PenLineCap.Round;
-            _line.StrokeDashCap = PenLineCap.Round;
-            if (n == 0)
-            {
-               x0 = e.GetPosition(this.Canvas).X;
-               y0 = e.GetPosition(this.Canvas).Y;
-            }
-            _line.X1 = x0 + n;
-            _line.Y1 = y0;
-            m_lines.Enqueue(_line);
+         if ((n - last_n) > 500)
+         {
+            ReportResult("Mouse Down");
+            n = 0;
+            last_n = 0;
          }
+         _line = new Line();
+         _line.Stroke = new SolidColorBrush(Colors.White);
+         _line.StrokeThickness = 5;
+         _line.StrokeStartLineCap = PenLineCap.Round;
+
+         _line.StrokeEndLineCap = PenLineCap.Round;
+         _line.StrokeDashCap = PenLineCap.Round;
+         if (n == 0)
+         {
+            x0 = e.GetPosition(this.Canvas).X;
+            y0 = e.GetPosition(this.Canvas).Y;
+         }
+         _line.X1 = x0 + n;
+         _line.Y1 = y0;
+         m_lines.Enqueue(_line);
       }
       private void Text(double x, double y, string text, Color color)
       {
